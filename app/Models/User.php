@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Service;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'role',
     ];
 
     /**
@@ -32,6 +35,27 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+     public function staffProfile()
+    {
+        return $this->hasOne(StaffProfile::class);
+    }
+
+    public function bookingsAsCustomer()
+    {
+        return $this->hasMany(Booking::class, 'customer_id');
+    }
+
+    public function bookingsAsStaff()
+    {
+        return $this->hasMany(Booking::class, 'staff_id');
+    }
+
+    public function services()
+    {
+        // hanya untuk staff
+        return $this->belongsToMany(Service::class, 'service_staff', 'staff_id', 'service_id');
+    }
 
     /**
      * The attributes that should be cast.
