@@ -13,8 +13,34 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        Dashboard
                     </x-nav-link>
+
+                    @auth
+                        @php $role = auth()->user()->role; @endphp
+
+                        @if ($role === 'admin')
+                            <x-nav-link :href="route('admin.services.index')" :active="request()->routeIs('admin.services.*')">
+                                Layanan
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.bookings.index')" :active="request()->routeIs('admin.bookings.*')">
+                                Booking
+                            </x-nav-link>
+
+                        @elseif ($role === 'staff')
+                            <x-nav-link :href="route('staff.dashboard')" :active="request()->routeIs('staff.*')">
+                                Dashboard Staff
+                            </x-nav-link>
+                            <x-nav-link :href="route('staff.bookings.index')" :active="request()->routeIs('staff.bookings.*')">
+                                Booking Saya
+                            </x-nav-link>
+
+                        @elseif ($role === 'customer')
+                            <x-nav-link :href="route('customer.bookings.index')" :active="request()->routeIs('customer.bookings.*')">
+                                Booking Saya
+                            </x-nav-link>
+                        @endif
+                    @endauth
                 </div>
             </div>
 
@@ -68,9 +94,36 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                Dashboard
             </x-responsive-nav-link>
+
+            @auth
+                @php $role = auth()->user()->role; @endphp
+
+                @if ($role === 'admin')
+                    <x-responsive-nav-link :href="route('admin.services.index')" :active="request()->routeIs('admin.services.*')">
+                        Layanan
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.bookings.index')" :active="request()->routeIs('admin.bookings.*')">
+                        Booking
+                    </x-responsive-nav-link>
+
+                @elseif ($role === 'staff')
+                    <x-responsive-nav-link :href="route('staff.dashboard')" :active="request()->routeIs('staff.*')">
+                        Dashboard Staff
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('staff.bookings.index')" :active="request()->routeIs('staff.bookings.*')">
+                        Booking Saya
+                    </x-responsive-nav-link>
+
+                @elseif ($role === 'customer')
+                    <x-responsive-nav-link :href="route('customer.bookings.index')" :active="request()->routeIs('customer.bookings.*')">
+                        Booking Saya
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
         </div>
+
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
