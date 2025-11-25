@@ -54,15 +54,13 @@
                         <label class="block text-xs font-medium text-slate-200">
                             Staff
                         </label>
-                        <select name="staff_id"
+                        <select name="staff_id" id="staffSelect"
                                 class="mt-1 block w-full rounded-lg border-slate-700 bg-slate-950/70 text-sm text-slate-100 focus:border-emerald-500 focus:ring-emerald-500">
-                            <option value="">-- Pilih staff --</option>
-                            @foreach ($staff as $s)
-                                <option value="{{ $s->id }}" @selected(old('staff_id') == $s->id)>
-                                    {{ $s->name }}
-                                </option>
-                            @endforeach
+                            <option value="">Pilih layanan dulu</option>
                         </select>
+                        <p class="text-[11px] text-slate-500 mt-1">
+                            Staff yang tersedia akan menyesuaikan layanan yang dipilih.
+                        </p>
                         <p class="text-[11px] text-slate-500 mt-1">
                             (Nanti bisa disaring per layanan, untuk sementara pilih manual.)
                         </p>
@@ -115,54 +113,126 @@
                         </button>
                     </div>
                 </form>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const serviceSelect = document.querySelector('[name="service_id"]');
+                        const staffSelect   = document.getElementById('staffSelect');
+                        const dateInput     = document.querySelector('[name="booking_date"]');
+                        const slotSelect    = document.getElementById('slotSelect');
+
+                        const oldStaffId  = @json(old('staff_id'));
+                        const oldServiceId = @json(old('service_id'));
+                        const oldStartTime = @json(old('start_time'));
+
+                        async function loadStaff() {
+                            const serviceId = serviceSelect.value;
+
+                            // reset slot
+                            slotSelect.innerHTML = `<option value="">Lengkapi pilihan dulu</option>`;
+
+                            if (!serviceId) {
+                                staffSelect.innerHTML = `<option value="">Pilih layanan dulu</option>`;
+                                staffSelect.disabled = true;
+                                return;
+                            }
+
+                            staffSelect.disabled = true;
+                            staffSelect.innerHTML = `<option value="">Loading staff...</option>`;
+
+                            try {
+                                const response = await fetch(`/customer/services/${serviceId}/staff`);
+                                const staff = await response.json();
+
+                                staffSelect.innerHTML = `<option value="">-- Pilih staff --</option>`;
+
+                                staff.forEach(s => {
+                                    const option = document.createElement('option');
+                                    option.value = s.id;
+                                    option.textContent = s.name;
+
+                                    if (oldStaffId && String(oldStaffId) === String(s.id)) {
+                                        option.selected = true;
+                                    }
+
+                                    staffSelect.appendChild(option);
+                                });
+
+                                staffSelect.disabled = false;
+
+                                // kalau ada oldStartTime & oldStaffId, nanti bisa auto load slot juga
+                                if (oldStaffId) {
+                                    loadSlots();
+                                }
+                            } catch (e) {
+                                staffSelect.innerHTML = `<option value="">Gagal load staff</option>`;
+                                staffSelect.disabled = false;
+                            }
+                        }
+
+                        async function loadSlots() {
+                            const serviceId = serviceSelect.value;
+                            const staffId   = staffSelect.value;
+                            const date      = dateInput.value;
+
+                            if (!serviceId || !staffId || !date) {
+                                slotSelect.innerHTML = `<option value="">Lengkapi layanan, staff & tanggal</option>`;
+                                return;
+                            }
+
+                            slotSelect.innerHTML = `<option value="">Loading slot...</option>`;
+
+                            try {
+                                const response = await fetch(
+                                    `/customer/slots?service_id=${serviceId}&staff_id=${staffId}&booking_date=${date}`
+                                );
+
+                                const slots = await response.json();
+
+                                slotSelect.innerHTML = '';
+
+                                if (slots.length === 0) {
+                                    slotSelect.innerHTML = `<option value="">Tidak ada slot tersedia</option>`;
+                                    return;
+                                }
+
+                                slots.forEach(slot => {
+                                    const option = document.createElement('option');
+                                    option.value = slot.start;
+                                    option.textContent = `${slot.start} - ${slot.end}`;
+
+                                    if (oldStartTime && oldStartTime === slot.start) {
+                                        option.selected = true;
+                                    }
+
+                                    slotSelect.appendChild(option);
+                                });
+                            } catch (e) {
+                                slotSelect.innerHTML = `<option value="">Gagal load slot</option>`;
+                            }
+                        }
+
+                        // event listeners
+                        serviceSelect.addEventListener('change', function () {
+                            // reset old state
+                            staffSelect.value = '';
+                            loadStaff();
+                        });
+
+                        staffSelect.addEventListener('change', loadSlots);
+                        dateInput.addEventListener('change', loadSlots);
+
+                        // initial state (kalau form balik karena error)
+                        if (oldServiceId) {
+                            serviceSelect.value = oldServiceId;
+                            loadStaff();
+                        }
+                    });
+                    </script>
+
             </div>
         </div>
     </div>
 </x-app-layout>
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const serviceSelect = document.querySelector('[name="service_id"]');
-    const staffSelect   = document.querySelector('[name="staff_id"]');
-    const dateInput     = document.querySelector('[name="booking_date"]');
-    const slotSelect    = document.getElementById('slotSelect');
-
-    async function loadSlots() {
-        const serviceId = serviceSelect.value;
-        const staffId   = staffSelect.value;
-        const date      = dateInput.value;
-
-        if (!serviceId || !staffId || !date) {
-            slotSelect.innerHTML = `<option>Lengkapi pilihan dulu</option>`;
-            return;
-        }
-
-        slotSelect.innerHTML = `<option>Loading slot...</option>`;
-
-        const response = await fetch(
-            `/customer/slots?service_id=${serviceId}&staff_id=${staffId}&booking_date=${date}`
-        );
-
-        const slots = await response.json();
-
-        slotSelect.innerHTML = '';
-
-        if (slots.length === 0) {
-            slotSelect.innerHTML = `<option>Tidak ada slot tersedia</option>`;
-            return;
-        }
-
-        slots.forEach(slot => {
-            const option = document.createElement('option');
-            option.value = slot.start;
-            option.textContent = `${slot.start} - ${slot.end}`;
-            slotSelect.appendChild(option);
-        });
-    }
-
-    serviceSelect.addEventListener('change', loadSlots);
-    staffSelect.addEventListener('change', loadSlots);
-    dateInput.addEventListener('change', loadSlots);
-});
-</script>

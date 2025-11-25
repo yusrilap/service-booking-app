@@ -29,11 +29,7 @@ class BookingController extends Controller
     {
         $services = Service::where('is_active', true)->orderBy('name')->get();
 
-        $staff = User::where('role', 'staff')
-            ->orderBy('name')
-            ->get();
-
-        return view('customer.bookings.create', compact('services', 'staff'));
+        return view('customer.bookings.create', compact('services'));
     }
 
     // SIMPAN BOOKING BARU
@@ -166,5 +162,24 @@ class BookingController extends Controller
 
         return response()->json($slots);
     }
+
+    public function getStaffForService($serviceId)
+    {
+        // pastikan service ada
+        $service = Service::findOrFail($serviceId);
+
+        // ambil staff yang punya relasi ke service ini lewat pivot service_staff
+        $staff = User::where('role', 'staff')
+            ->whereHas('services', function ($q) use ($serviceId) {
+                $q->where('services.id', $serviceId);
+            })
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($staff);
+    }
+
+
 
 }

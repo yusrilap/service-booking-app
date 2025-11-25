@@ -59,10 +59,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->prefix('customer')
         ->name('customer.')
         ->group(function () {
+            Route::get('slots', [CustomerBookingController::class, 'getAvailableSlots'])
+            ->name('slots');
             Route::get('bookings', [CustomerBookingController::class, 'index'])->name('bookings.index');
             Route::get('bookings/create', [CustomerBookingController::class, 'create'])->name('bookings.create');
             Route::post('bookings', [CustomerBookingController::class, 'store'])->name('bookings.store');
-            Route::get('slots', [CustomerBookingController::class, 'getAvailableSlots'])->name('customer.slots');
+            Route::get('services/{service}/staff', [CustomerBookingController::class, 'getStaffForService'])
+            ->name('services.staff');
         });
         
 });
