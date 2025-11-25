@@ -50,6 +50,68 @@
                 </div>
 
                 <div class="p-4 overflow-x-auto">
+                    <form method="GET" class="mb-4 space-y-3 sm:space-y-0 sm:flex sm:items-end sm:gap-3">
+    
+                        {{-- Search --}}
+                        <div class="w-full sm:w-1/3">
+                            <label class="block text-xs text-slate-400 mb-1">Cari customer / staff</label>
+                            <input type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="Nama customer / staff..."
+                                class="w-full rounded-lg border-slate-700 bg-slate-950/70 text-sm text-slate-100 focus:border-emerald-500 focus:ring focus:ring-emerald-500/20">
+                        </div>
+
+                        {{-- Filter Status --}}
+                        <div class="w-full sm:w-1/4">
+                            <label class="block text-xs text-slate-400 mb-1">Status</label>
+                            <select name="status"
+                                class="w-full rounded-lg border-slate-700 bg-slate-950/70 text-sm text-slate-100 focus:border-emerald-500 focus:ring focus:ring-emerald-500/20">
+                                <option value="">Semua</option>
+                                <option value="pending" @selected(request('status') === 'pending')>Pending</option>
+                                <option value="confirmed" @selected(request('status') === 'confirmed')>Confirmed</option>
+                                <option value="completed" @selected(request('status') === 'completed')>Completed</option>
+                                <option value="cancelled" @selected(request('status') === 'cancelled')>Cancelled</option>
+                            </select>
+                        </div>
+
+                        {{-- Filter Tanggal --}}
+                        <div class="w-full sm:w-1/4">
+                            <label class="block text-xs text-slate-400 mb-1">Pilih Tanggal</label>
+                            <div class="relative">
+                                <input type="date"
+                                    name="date"
+                                    value="{{ request('date') }}"
+                                    class="w-full rounded-lg border-slate-700 bg-slate-950/70 text-sm text-slate-100 pl-10 focus:border-emerald-500 focus:ring focus:ring-emerald-500/20">
+
+                                {{-- Icon kalender --}}
+                                <div class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        {{-- Button --}}
+                        <div class="flex gap-2">
+                            <button type="submit"
+                                class="px-4 py-2 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-sm hover:bg-emerald-500/30 transition">
+                                Filter
+                            </button>
+
+                            <a href="{{ route('admin.bookings.index') }}"
+                                class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 text-sm hover:bg-slate-700 transition">
+                                Reset
+                            </a>
+                        </div>
+
+                    </form>
+
                     <table class="min-w-full text-xs sm:text-sm">
                         <thead>
                             <tr class="border-b border-slate-800 text-slate-400 text-[11px] uppercase tracking-wide">
