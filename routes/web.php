@@ -40,9 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('bookings', [AdminBookingController::class, 'index'])
                 ->name('bookings.index');
 
-            // 👉 route untuk ubah status
             Route::patch('bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])
                 ->name('bookings.update-status');
+            Route::get('reports', [AdminBookingController::class, 'reportDashboard'])
+                ->name('reports.dashboard');
         });
 
     // STAFF

@@ -26,6 +26,9 @@
                             <x-nav-link :href="route('admin.bookings.index')" :active="request()->routeIs('admin.bookings.*')">
                                 Booking
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.reports.dashboard')" :active="request()->routeIs('admin.reports.*')">
+                                Reports
+                            </x-nav-link>
 
                         @elseif ($role === 'staff')
                             <x-nav-link :href="route('staff.dashboard')" :active="request()->routeIs('staff.*')">
@@ -107,6 +110,7 @@
                     <x-responsive-nav-link :href="route('admin.bookings.index')" :active="request()->routeIs('admin.bookings.*')">
                         Booking
                     </x-responsive-nav-link>
+
 
                 @elseif ($role === 'staff')
                     <x-responsive-nav-link :href="route('staff.dashboard')" :active="request()->routeIs('staff.*')">
