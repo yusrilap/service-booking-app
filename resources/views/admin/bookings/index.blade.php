@@ -78,22 +78,14 @@
                         {{-- Filter Tanggal --}}
                         <div class="w-full sm:w-1/4">
                             <label class="block text-xs text-slate-400 mb-1">Pilih Tanggal</label>
-                            <div class="relative">
-                                <input type="date"
-                                    name="date"
-                                    value="{{ request('date') }}"
-                                    class="w-full rounded-lg border-slate-700 bg-slate-950/70 text-sm text-slate-100 pl-10 focus:border-emerald-500 focus:ring focus:ring-emerald-500/20">
-
-                                {{-- Icon kalender --}}
-                                <div class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                </div>
-                            </div>
+                            <input type="text"
+                                id="filterDate"
+                                name="date"
+                                placeholder="Klik untuk pilih"
+                                value="{{ request('date') }}"
+                                class="w-full rounded-lg border-slate-700 bg-slate-950/70 text-sm text-slate-100 focus:border-emerald-500 focus:ring focus:ring-emerald-500/20">
                         </div>
+
 
 
 
@@ -234,3 +226,13 @@
         </div>
     </div>
 </x-app-layout>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    flatpickr("#filterDate", {
+        dateFormat: "Y-m-d",
+        defaultDate: "{{ request('date') ?? '' }}",
+        allowInput: true,
+    });
+});
+</script>
